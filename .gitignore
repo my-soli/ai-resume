@@ -32,6 +32,7 @@ landing/node_modules/
 landing/.next/
 landing/out/
 landing/.env.local
+landing/package-lock.json
 
 # Claude Code local settings
 .claude/
