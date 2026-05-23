@@ -9,6 +9,16 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "postgresql://resumeai:resumeai_password@localhost:5432/resumeai_db"
 
+    @property
+    def async_database_url(self) -> str:
+        # Railway injects postgresql:// but asyncpg needs postgresql+asyncpg://
+        url = self.DATABASE_URL
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        return url
+
     JWT_SECRET_KEY: str = "change-this-secret-key-in-production"
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
