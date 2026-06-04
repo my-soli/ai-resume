@@ -1,9 +1,6 @@
-const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.resumeai.resume_ai";
-
 export default function Hero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-purple-50 pt-20 pb-24">
-      {/* Background decoration */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary opacity-5 rounded-full -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent opacity-5 rounded-full translate-y-1/2 -translate-x-1/2" />
 
@@ -11,7 +8,7 @@ export default function Hero() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 rounded-full px-4 py-1.5 mb-8">
           <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-          <span className="text-primary text-sm font-medium">Powered by GPT-4o</span>
+          <span className="text-primary text-sm font-medium">Powered by Llama AI — Free to start</span>
         </div>
 
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-6">
@@ -24,23 +21,15 @@ export default function Hero() {
 
         <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
           Resume AI scores your resume for ATS compatibility, rewrites your content with stronger language,
-          and tailors it to job descriptions — all in seconds.
+          and tailors it to any job description — right in your browser, in seconds.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
           <a
-            href={PLAY_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 bg-gray-900 text-white px-6 py-3.5 rounded-xl font-medium hover:bg-gray-700 transition-colors shadow-lg"
+            href="/app/register"
+            className="bg-primary text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100"
           >
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3.18 23.76c.37.21.8.22 1.2.04l12.75-7.37-2.82-2.82-11.13 10.15zM20.47 10.41l-2.75-1.59L14.6 12l3.12 3.12 2.75-1.59c.78-.45.78-1.67 0-2.12zM1.56 1.24C1.21 1.61 1 2.16 1 2.86v18.28c0 .7.21 1.25.56 1.62l.09.08 10.24-10.24v-.24L1.65 1.16l-.09.08z"/>
-            </svg>
-            <div className="text-left">
-              <div className="text-xs opacity-75">Download on</div>
-              <div className="text-base font-semibold leading-none">Google Play</div>
-            </div>
+            Build My Resume — Free
           </a>
           <a
             href="#how-it-works"
@@ -53,33 +42,41 @@ export default function Hero() {
           </a>
         </div>
 
-        {/* App mockup placeholder */}
-        <div className="max-w-xs mx-auto">
-          <div className="bg-gray-900 rounded-3xl p-2 shadow-2xl">
-            <div className="bg-white rounded-2xl overflow-hidden aspect-[9/19]">
-              <div className="bg-gradient-to-br from-primary to-accent h-28 flex items-center justify-center">
-                <div className="text-white text-center">
-                  <div className="text-3xl font-bold">87</div>
-                  <div className="text-xs opacity-75">ATS Score</div>
-                </div>
+        {/* Web app mockup */}
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
+            {/* Browser chrome */}
+            <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center gap-2">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-400" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                <div className="w-3 h-3 rounded-full bg-green-400" />
               </div>
-              <div className="p-3 space-y-2">
-                {["AI Generate", "AI Improve", "AI Score"].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-gray-50 rounded-xl p-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
-                      <div className="w-3 h-3 bg-primary rounded-sm" />
+              <div className="flex-1 bg-white rounded-lg border border-gray-200 px-3 py-1 text-xs text-gray-400 mx-4 text-left">
+                resumeai.app/app/dashboard
+              </div>
+            </div>
+            {/* Mock dashboard */}
+            <div className="flex">
+              <div className="w-40 bg-gray-50 border-r border-gray-100 p-3 space-y-2">
+                <div className="text-xs text-gray-500 px-2 py-1">My Resumes</div>
+                <div className="text-xs text-primary bg-indigo-50 px-2 py-1.5 rounded-lg font-medium">+ New Resume</div>
+              </div>
+              <div className="flex-1 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="h-2 bg-gray-200 rounded w-32" />
+                  <div className="h-6 bg-primary rounded-lg w-20 opacity-80" />
+                </div>
+                {[92, 78, 85].map((score, i) => (
+                  <div key={i} className="bg-gray-50 rounded-xl p-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-100" />
+                    <div className="flex-1 space-y-1">
+                      <div className="h-2 bg-gray-200 rounded w-28" />
+                      <div className="h-1.5 bg-gray-100 rounded w-20" />
                     </div>
-                    <span className="text-xs font-medium text-gray-700">{item}</span>
-                    <div className="ml-auto w-4 h-4 text-gray-300">›</div>
+                    <span className={`text-xs font-bold ${score >= 80 ? "text-green-500" : "text-amber-500"}`}>{score}</span>
                   </div>
                 ))}
-                <div className="bg-indigo-50 rounded-xl p-2.5 mt-3">
-                  <div className="flex gap-1 flex-wrap">
-                    {["React", "Python", "Leadership", "AWS"].map((k) => (
-                      <span key={k} className="text-xs bg-indigo-100 text-primary px-2 py-0.5 rounded-full">{k}</span>
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
           </div>

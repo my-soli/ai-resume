@@ -216,7 +216,7 @@ class AIService:
     async def _call_openai(self, prompt: str) -> dict:
         try:
             response = await self.client.chat.completions.create(
-                model=settings.OPENAI_MODEL,
+                model=settings.GROQ_MODEL,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": prompt},
@@ -241,7 +241,7 @@ class AIService:
         except openai.RateLimitError:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="AI quota exceeded. Add credits at platform.openai.com and try again.",
+                detail="AI rate limit reached. Please wait a moment and try again.",
             )
         except openai.AuthenticationError:
             raise HTTPException(

@@ -1,5 +1,3 @@
-const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.resumeai.resume_ai";
-
 const freeTier = [
   "3 AI operations per month",
   "Full resume builder (5-step form)",
@@ -51,12 +49,10 @@ export default function Pricing() {
               ))}
             </ul>
             <a
-              href={PLAY_STORE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/app/register"
               className="block w-full text-center border-2 border-gray-200 text-gray-700 font-medium py-3 rounded-xl hover:border-primary hover:text-primary transition-colors"
             >
-              Download Free
+              Start Free
             </a>
           </div>
 
@@ -86,15 +82,13 @@ export default function Pricing() {
               ))}
             </ul>
             <a
-              href={PLAY_STORE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/app/register"
               className="block w-full text-center bg-primary text-white font-medium py-3 rounded-xl hover:bg-indigo-700 transition-colors"
             >
               Get Pro — $4.99/mo
             </a>
             <p className="text-xs text-gray-500 text-center mt-3">
-              Billed monthly via Google Play. Cancel anytime.
+              Billed monthly via Stripe. Cancel anytime.
             </p>
           </div>
         </div>

@@ -25,9 +25,9 @@ const features = [
   },
   {
     icon: "📄",
-    title: "One-Tap PDF Export",
+    title: "One-Click PDF Export",
     description:
-      "Download a clean, ATS-friendly PDF in one tap and share it directly to email, WhatsApp, Drive, or anywhere else — straight from your phone.",
+      "Download a clean, ATS-friendly PDF instantly. Share it directly to email, Google Drive, or any job portal — ready to submit in seconds.",
     color: "bg-green-50",
     iconBg: "bg-green-100",
   },
@@ -58,7 +58,7 @@ export default function Features() {
             Everything you need to land the interview
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Six powerful tools in one mobile app. No subscriptions required to
+            Six powerful tools in one web app. No credit card required to
             get started.
           </p>
         </div>

@@ -98,20 +98,23 @@ def generate_resume_pdf(resume_data: dict) -> bytes:
         )
         story.append(Spacer(1, 4))
         for exp in work_exp:
-            end = "Present" if exp.get("current") else exp.get("end_date", "Present")
+            end = "Present" if exp.get("current") else exp.get("end_date", "")
             story.append(
                 Paragraph(
                     f"{exp.get('position', '')} — {exp.get('company', '')}",
                     job_title_style,
                 )
             )
-            story.append(
-                Paragraph(f"{exp.get('start_date', '')} – {end}", meta_style)
-            )
+            start = exp.get("start_date", "")
+            if start or end:
+                story.append(
+                    Paragraph(f"{start} – {end or 'Present'}", meta_style)
+                )
             if exp.get("description"):
                 story.append(Paragraph(exp["description"], body_style))
-            for achievement in exp.get("achievements", []):
-                story.append(Paragraph(f"• {achievement}", body_style))
+            for achievement in (exp.get("achievements") or []):
+                if achievement and achievement.strip():
+                    story.append(Paragraph(f"• {achievement}", body_style))
             story.append(Spacer(1, 6))
 
     education = resume_data.get("education", [])
@@ -122,16 +125,15 @@ def generate_resume_pdf(resume_data: dict) -> bytes:
         )
         story.append(Spacer(1, 4))
         for edu in education:
-            story.append(
-                Paragraph(
-                    f"{edu.get('degree', '')} in {edu.get('field', '')} — {edu.get('institution', '')}",
-                    job_title_style,
-                )
-            )
+            degree = edu.get('degree', '')
+            field = edu.get('field', '')
+            institution = edu.get('institution', '')
+            degree_line = f"{degree} in {field} — {institution}" if field else f"{degree} — {institution}"
+            story.append(Paragraph(degree_line, job_title_style))
+            start = edu.get("start_date", "")
             end = edu.get("end_date", "")
-            story.append(
-                Paragraph(f"{edu.get('start_date', '')} – {end}", meta_style)
-            )
+            if start or end:
+                story.append(Paragraph(f"{start} – {end}", meta_style))
             if edu.get("gpa"):
                 story.append(Paragraph(f"GPA: {edu['gpa']}", body_style))
             story.append(Spacer(1, 6))

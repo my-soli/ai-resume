@@ -1,8 +1,6 @@
 "use client";
 import { useState } from "react";
 
-const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.resumeai.resume_ai";
-
 export default function Header() {
   const [open, setOpen] = useState(false);
 
@@ -22,13 +20,12 @@ export default function Header() {
           <a href="#how-it-works" className="text-sm text-gray-600 hover:text-primary transition-colors">How it works</a>
           <a href="#pricing" className="text-sm text-gray-600 hover:text-primary transition-colors">Pricing</a>
           <a href="#faq" className="text-sm text-gray-600 hover:text-primary transition-colors">FAQ</a>
+          <a href="/app/login" className="text-sm text-gray-600 hover:text-primary transition-colors">Sign in</a>
           <a
-            href={PLAY_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/app/register"
             className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
           >
-            Download Free
+            Get Started Free
           </a>
         </nav>
 
@@ -47,13 +44,12 @@ export default function Header() {
           <a href="#how-it-works" className="text-sm text-gray-700" onClick={() => setOpen(false)}>How it works</a>
           <a href="#pricing" className="text-sm text-gray-700" onClick={() => setOpen(false)}>Pricing</a>
           <a href="#faq" className="text-sm text-gray-700" onClick={() => setOpen(false)}>FAQ</a>
+          <a href="/app/login" className="text-sm text-gray-700" onClick={() => setOpen(false)}>Sign in</a>
           <a
-            href={PLAY_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/app/register"
             className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium text-center"
           >
-            Download Free
+            Get Started Free
           </a>
         </div>
       )}

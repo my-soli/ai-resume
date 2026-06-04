@@ -6,12 +6,19 @@ backend/.env
 
 # Python
 backend/venv/
+env/
 backend/__pycache__/
 backend/**/__pycache__/
 backend/**/*.pyc
 backend/**/*.pyo
 backend/.pytest_cache/
 backend/*.egg-info/
+
+# Backend runtime artifacts
+backend/storage/
+backend/uvicorn.log
+backend/uvicorn.err
+backend/next.log
 
 # Flutter
 flutter_app/.dart_tool/
