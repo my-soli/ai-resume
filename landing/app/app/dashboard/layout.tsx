@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { users, type User } from "@/lib/api";
+import Logo from "@/components/Logo";
 
 export default function DashboardLayout({
   children,
@@ -43,11 +44,8 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside className="w-60 bg-white border-r border-gray-100 flex flex-col shrink-0">
         <div className="px-5 py-5 border-b border-gray-100">
-          <Link href="/app/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-sm">RA</span>
-            </div>
-            <span className="font-bold text-gray-900">Resume AI</span>
+          <Link href="/app/dashboard">
+            <Logo size={28} />
           </Link>
         </div>
 
