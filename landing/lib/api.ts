@@ -142,6 +142,24 @@ export const resumes = {
   update: (id: string, data: Partial<ResumePayload>) =>
     req<Resume>(`/resumes/${id}`, { method: "PATCH", body: data }),
   delete: (id: string) => req<null>(`/resumes/${id}`, { method: "DELETE" }),
+
+  parseUpload: async (file: File): Promise<ResumePayload & { title: string }> => {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch(`${BASE}/api/v1/resumes/upload-parse`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
+    const text = await res.text();
+    let data: Record<string, unknown>;
+    try { data = JSON.parse(text); }
+    catch { throw new Error(`Server error ${res.status} — is the backend running?`); }
+    if (!res.ok) throw new Error((data.detail as string) ?? `Error ${res.status}`);
+    return data as ResumePayload & { title: string };
+  },
 };
 
 export async function downloadPdf(resumeId: string, title: string) {

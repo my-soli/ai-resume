@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { resumes, type ResumePayload, type WorkExperience, type Education, type Project } from "@/lib/api";
@@ -22,6 +22,8 @@ export default function NewResumePage() {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState("");
   const [personalInfo, setPersonalInfo] = useState({
@@ -42,6 +44,41 @@ export default function NewResumePage() {
   }
   function updateProject(i: number, field: keyof Project, value: unknown) {
     setProjects((prev) => prev.map((p, idx) => idx === i ? { ...p, [field]: value } : p));
+  }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const parsed = await resumes.parseUpload(file);
+      if (parsed.title) setTitle(parsed.title);
+      if (parsed.personal_info) {
+        const pi = parsed.personal_info as Record<string, string>;
+        setPersonalInfo({
+          name: pi.name ?? "", email: pi.email ?? "", phone: pi.phone ?? "",
+          location: pi.location ?? "", linkedin: pi.linkedin ?? "",
+          github: pi.github ?? "", website: pi.website ?? "", summary: pi.summary ?? "",
+        });
+      }
+      if (Array.isArray(parsed.work_experience) && parsed.work_experience.length > 0)
+        setWorkExp(parsed.work_experience as WorkExperience[]);
+      if (Array.isArray(parsed.education) && parsed.education.length > 0)
+        setEducation(parsed.education as Education[]);
+      if (Array.isArray(parsed.skills) && parsed.skills.length > 0)
+        setSkillsRaw((parsed.skills as string[]).join(", "));
+      if (Array.isArray(parsed.projects) && parsed.projects.length > 0)
+        setProjects(parsed.projects as Project[]);
+      if (parsed.job_description) setJobDescription(parsed.job_description);
+      // Jump straight to review step
+      setStep(0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   }
 
   async function handleSubmit() {
@@ -83,6 +120,21 @@ export default function NewResumePage() {
           <h1 className="text-2xl font-bold text-gray-900">New Resume</h1>
           <p className="text-sm text-gray-500">Step {step + 1} of {STEPS.length}</p>
         </div>
+      </div>
+
+      {/* Upload existing CV */}
+      <div className="mb-6 p-4 bg-indigo-50 border border-indigo-100 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-800">Have an existing CV?</p>
+          <p className="text-xs text-gray-500 mt-0.5">Upload a PDF or DOCX and we&apos;ll fill in all the fields automatically.</p>
+        </div>
+        <label className={`shrink-0 cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${uploading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-primary text-white hover:bg-indigo-700"}`}>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          {uploading ? "Parsing…" : "Upload CV"}
+          <input ref={fileRef} type="file" accept=".pdf,.docx,.doc" className="hidden" onChange={handleUpload} disabled={uploading} />
+        </label>
       </div>
 
       {/* Progress */}

@@ -1,5 +1,6 @@
+import io
 import uuid
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile, HTTPException
 from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
@@ -13,8 +14,37 @@ from app.schemas.resume import (
 from app.services.resume_service import ResumeService
 from app.services.pdf_service import generate_resume_pdf
 from app.services.storage_service import save_pdf
+from app.services.ai_service import AIService
+
+
+def _extract_text(file_bytes: bytes, filename: str) -> str:
+    name = filename.lower()
+    if name.endswith(".pdf"):
+        from pypdf import PdfReader
+        reader = PdfReader(io.BytesIO(file_bytes))
+        return "\n".join(page.extract_text() or "" for page in reader.pages).strip()
+    if name.endswith((".docx", ".doc")):
+        from docx import Document
+        doc = Document(io.BytesIO(file_bytes))
+        return "\n".join(p.text for p in doc.paragraphs).strip()
+    raise HTTPException(400, "Unsupported file type. Upload a PDF or DOCX file.")
 
 router = APIRouter(prefix="/resumes", tags=["Resumes"])
+
+
+@router.post("/upload-parse")
+async def upload_parse_resume(
+    file: UploadFile = File(...),
+    user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    content = await file.read()
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(400, "File too large. Maximum 5 MB.")
+    text = _extract_text(content, file.filename or "")
+    if not text:
+        raise HTTPException(400, "Could not extract text from file. Make sure the CV contains selectable text.")
+    return await AIService(db).parse_cv_text(text)
 
 
 @router.post("", response_model=ResumeResponse, status_code=201)

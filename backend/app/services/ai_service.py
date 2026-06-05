@@ -68,6 +68,38 @@ class AIService:
         result = await self._call_openai(prompt)
         return await self._save_result(resume_id, "score", result)
 
+    async def parse_cv_text(self, cv_text: str) -> dict:
+        prompt = (
+            "Parse this CV/resume into structured JSON. "
+            "Extract information EXACTLY as written — do NOT enhance or rewrite.\n\n"
+            f"CV TEXT:\n{cv_text[:8000]}\n\n"
+            "Return ONLY this JSON (leave empty string/array for missing fields):\n"
+            '{"title":"","personal_info":{"name":"","email":"","phone":"","location":"",'
+            '"linkedin":"","github":"","website":"","summary":""},'
+            '"work_experience":[{"company":"","position":"","start_date":"","end_date":"",'
+            '"current":false,"description":"","achievements":[]}],'
+            '"education":[{"institution":"","degree":"","field":"","start_date":"","end_date":"","gpa":""}],'
+            '"skills":[],'
+            '"projects":[{"name":"","description":"","technologies":[],"url":""}],'
+            '"job_description":""}'
+        )
+        try:
+            response = await self.client.chat.completions.create(
+                model=settings.GROQ_MODEL,
+                messages=[
+                    {"role": "system", "content": "You are a resume parser. Extract information from CVs into structured JSON. Return ONLY valid JSON, nothing else."},
+                    {"role": "user", "content": prompt},
+                ],
+                response_format={"type": "json_object"},
+                temperature=0.1,
+                max_tokens=4096,
+            )
+            return json.loads(response.choices[0].message.content)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=502, detail="CV parsing returned malformed JSON")
+        except Exception as e:
+            raise HTTPException(status_code=502, detail=f"CV parsing failed: {str(e)}")
+
     async def get_usage(self, user_id: str) -> dict:
         user_result = await self.db.execute(select(User).where(User.id == user_id))
         user = user_result.scalar_one_or_none()

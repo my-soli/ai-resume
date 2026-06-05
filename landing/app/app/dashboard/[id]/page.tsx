@@ -108,6 +108,41 @@ export default function ResumeEditorPage() {
     }
   }
 
+  function applyAIToForm() {
+    if (!aiResult?.structured_data) return;
+    const sd = aiResult.structured_data as Record<string, unknown>;
+
+    if (typeof sd.summary === "string" && sd.summary)
+      setPersonal((p) => ({ ...p, summary: sd.summary as string }));
+
+    if (Array.isArray(sd.skills) && (sd.skills as string[]).length > 0)
+      setSkillsRaw((sd.skills as string[]).join(", "));
+
+    if (Array.isArray(sd.experience)) {
+      setWorkExp((prev) =>
+        prev.map((w, i) => {
+          const aiExp = (sd.experience as Array<{ bullets?: string[] }>)[i];
+          if (!aiExp?.bullets?.length) return w;
+          return { ...w, achievements: aiExp.bullets };
+        })
+      );
+    }
+
+    if (Array.isArray(sd.projects)) {
+      setProjects((prev) =>
+        prev.map((p, i) => {
+          const ap = (sd.projects as Array<{ description?: string; impact?: string }>)[i];
+          if (!ap) return p;
+          const desc = [ap.description, ap.impact].filter(Boolean).join(" ") || p.description;
+          return { ...p, description: desc };
+        })
+      );
+    }
+
+    setSaveMsg("AI applied — click Save to keep changes");
+    setTimeout(() => setSaveMsg(""), 4000);
+  }
+
   function updateWork(i: number, field: keyof WorkExperience, value: unknown) {
     setWorkExp((prev) => prev.map((w, idx) => idx === i ? { ...w, [field]: value } : w));
   }
@@ -430,6 +465,17 @@ export default function ResumeEditorPage() {
                 </ul>
               </div>
             )}
+
+            {/* Apply AI Changes */}
+            <button
+              onClick={applyAIToForm}
+              className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Apply AI Changes to Resume
+            </button>
 
             {/* Resume Text */}
             {aiResult.resume_text && (
