@@ -18,16 +18,20 @@ from app.services.ai_service import AIService
 
 
 def _extract_text(file_bytes: bytes, filename: str) -> str:
-    name = filename.lower()
-    if name.endswith(".pdf"):
-        from pypdf import PdfReader
-        reader = PdfReader(io.BytesIO(file_bytes))
-        return "\n".join(page.extract_text() or "" for page in reader.pages).strip()
-    if name.endswith((".docx", ".doc")):
-        from docx import Document
-        doc = Document(io.BytesIO(file_bytes))
-        return "\n".join(p.text for p in doc.paragraphs).strip()
-    raise HTTPException(400, "Unsupported file type. Upload a PDF or DOCX file.")
+    name = (filename or "").lower()
+    try:
+        if name.endswith(".pdf"):
+            from pypdf import PdfReader
+            reader = PdfReader(io.BytesIO(file_bytes))
+            return "\n".join(page.extract_text() or "" for page in reader.pages).strip()
+        if name.endswith((".docx", ".doc")):
+            import docx2txt
+            return docx2txt.process(io.BytesIO(file_bytes)).strip()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(422, f"Could not read file: {exc}") from exc
+    raise HTTPException(400, "Unsupported file type. Please upload a PDF or DOCX.")
 
 router = APIRouter(prefix="/resumes", tags=["Resumes"])
 
@@ -38,13 +42,18 @@ async def upload_parse_resume(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
-    content = await file.read()
-    if len(content) > 5 * 1024 * 1024:
-        raise HTTPException(400, "File too large. Maximum 5 MB.")
-    text = _extract_text(content, file.filename or "")
-    if not text:
-        raise HTTPException(400, "Could not extract text from file. Make sure the CV contains selectable text.")
-    return await AIService(db).parse_cv_text(text)
+    try:
+        content = await file.read()
+        if len(content) > 5 * 1024 * 1024:
+            raise HTTPException(400, "File too large. Maximum 5 MB.")
+        text = _extract_text(content, file.filename or "")
+        if not text:
+            raise HTTPException(400, "Could not extract text. Make sure the CV has selectable text (not a scanned image).")
+        return await AIService(db).parse_cv_text(text)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(500, f"Upload failed: {exc}") from exc
 
 
 @router.post("", response_model=ResumeResponse, status_code=201)
