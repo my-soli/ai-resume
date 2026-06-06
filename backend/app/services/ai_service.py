@@ -11,7 +11,7 @@ from app.schemas.ai import AIResultResponse
 from app.core.openai_client import get_openai_client
 from app.core.config import settings
 
-FREE_TIER_LIMIT = 3
+FREE_TIER_LIMIT = 5
 
 SYSTEM_PROMPT = """You are an expert resume writer and ATS (Applicant Tracking System) optimization specialist with 15+ years of experience helping candidates land interviews at top companies.
 

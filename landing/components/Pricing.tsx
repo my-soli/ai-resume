@@ -1,5 +1,5 @@
 const freeTier = [
-  "3 AI operations per month",
+  "5 AI operations per month",
   "Full resume builder (5-step form)",
   "PDF download & share",
   "Version history",
@@ -88,7 +88,7 @@ export default function Pricing() {
               Get Pro — $4.99/mo
             </a>
             <p className="text-xs text-gray-500 text-center mt-3">
-              Billed monthly via Stripe. Cancel anytime.
+              Billed monthly via Paystack. Cancel anytime.
             </p>
           </div>
         </div>
