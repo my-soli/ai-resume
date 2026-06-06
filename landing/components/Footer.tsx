@@ -14,13 +14,14 @@ export default function Footer() {
             <a href="#features" className="hover:text-white transition-colors">Features</a>
             <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
-            {/* When app is live, link to in-app privacy policy or host a web version */}
-            <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="mailto:support@resumeai.app" className="hover:text-white transition-colors">Contact</a>
+            <a href="/terms" className="hover:text-white transition-colors">Terms</a>
+            <a href="/privacy" className="hover:text-white transition-colors">Privacy</a>
+            <a href="/refund" className="hover:text-white transition-colors">Refunds</a>
+            <a href="mailto:ronoshalin@gmail.com" className="hover:text-white transition-colors">Contact</a>
           </nav>
 
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Resume AI. All rights reserved.
+            © {new Date().getFullYear()} AICVBuilder. All rights reserved.
           </p>
         </div>
       </div>
