@@ -5,6 +5,16 @@ import Link from "next/link";
 import { users, type User } from "@/lib/api";
 import Logo from "@/components/Logo";
 
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Paddle?: any;
+  }
+}
+
+const PADDLE_TOKEN = "live_f4a6df1ec37709695edb6863591";
+const PADDLE_PRICE_ID = "pri_01kteyj83nxmtebqv9f48316d0";
+
 export default function DashboardLayout({
   children,
 }: {
@@ -28,6 +38,26 @@ export default function DashboardLayout({
         router.replace("/app/login");
       });
   }, [router]);
+
+  // Load Paddle.js
+  useEffect(() => {
+    if (document.getElementById("paddle-js")) return;
+    const script = document.createElement("script");
+    script.id = "paddle-js";
+    script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
+    script.onload = () => {
+      window.Paddle?.Initialize({ token: PADDLE_TOKEN });
+    };
+    document.head.appendChild(script);
+  }, []);
+
+  function openCheckout() {
+    if (!user || !window.Paddle) return;
+    window.Paddle.Checkout.open({
+      items: [{ priceId: PADDLE_PRICE_ID, quantity: 1 }],
+      customer: { email: user.email },
+    });
+  }
 
   if (!user) {
     return (
@@ -92,13 +122,21 @@ export default function DashboardLayout({
               </div>
               <div className="text-xs text-gray-500 truncate">
                 {user.is_pro ? (
-                  <span className="text-primary font-medium">Pro</span>
+                  <span className="text-primary font-medium">✦ Pro</span>
                 ) : (
                   "Free plan"
                 )}
               </div>
             </div>
           </div>
+          {!user.is_pro && (
+            <button
+              onClick={openCheckout}
+              className="w-full text-center bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-xs font-semibold py-2 rounded-lg hover:opacity-90 transition-opacity mb-2"
+            >
+              Upgrade to Pro — $4.99/mo
+            </button>
+          )}
           <button
             onClick={() => {
               localStorage.clear();

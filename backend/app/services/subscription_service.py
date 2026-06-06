@@ -76,6 +76,24 @@ class SubscriptionService:
                 detail="Purchase verification failed",
             )
 
+    async def paddle_activate(self, email: str) -> None:
+        result = await self.db.execute(select(User).where(User.email == email))
+        user = result.scalar_one_or_none()
+        if not user:
+            return
+        user.is_pro = True
+        user.subscription_expires_at = datetime.now(timezone.utc) + timedelta(days=32)
+        await self.db.commit()
+
+    async def paddle_cancel(self, email: str) -> None:
+        result = await self.db.execute(select(User).where(User.email == email))
+        user = result.scalar_one_or_none()
+        if not user:
+            return
+        user.is_pro = False
+        user.subscription_expires_at = None
+        await self.db.commit()
+
     async def get_subscription_status(self, user_id: str) -> dict:
         result = await self.db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()

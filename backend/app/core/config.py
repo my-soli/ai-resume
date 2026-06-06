@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     GOOGLE_PLAY_PACKAGE_NAME: str = "com.resumeai.resume_ai"
     GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: Optional[str] = None
 
+    # Paddle billing
+    PADDLE_WEBHOOK_SECRET: Optional[str] = None
+
     # Email / SMTP (optional — if not set, reset codes are printed to logs)
     SMTP_HOST: Optional[str] = None
     SMTP_PORT: int = 587
