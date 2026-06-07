@@ -11,6 +11,13 @@ import {
 const TABS = ["Personal", "Experience", "Education", "Skills", "Projects", "Job Description"] as const;
 type Tab = typeof TABS[number];
 
+const TEMPLATES = [
+  { id: "modern",    name: "Modern",    preview: "bg-gradient-to-b from-indigo-500 via-indigo-100 to-white" },
+  { id: "classic",   name: "Classic",   preview: "bg-gradient-to-b from-gray-800 via-gray-200 to-white" },
+  { id: "executive", name: "Executive", preview: "bg-gradient-to-b from-blue-900 via-blue-100 to-white" },
+  { id: "minimal",   name: "Minimal",   preview: "bg-gradient-to-b from-gray-100 to-white border border-gray-200" },
+];
+
 export default function ResumeEditorPage() {
   const { id } = useParams<{ id: string }>();
   const [resume, setResume] = useState<Resume | null>(null);
@@ -34,6 +41,7 @@ export default function ResumeEditorPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [template, setTemplate] = useState("modern");
 
   const populateForm = useCallback((r: Resume) => {
     setTitle(r.title);
@@ -381,15 +389,36 @@ export default function ResumeEditorPage() {
           })}
         </div>
 
+        {/* Template Picker */}
+        <div>
+          <h3 className="text-xs font-semibold text-gray-700 mb-2">Resume Template</h3>
+          <div className="grid grid-cols-2 gap-2">
+            {TEMPLATES.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTemplate(t.id)}
+                className={`flex flex-col items-center p-2 rounded-xl border-2 transition-all text-xs font-medium gap-1 ${
+                  template === t.id
+                    ? "border-primary bg-indigo-50 text-primary"
+                    : "border-gray-100 hover:border-gray-300 text-gray-500"
+                }`}
+              >
+                <div className={`w-full h-10 rounded-lg ${t.preview}`} />
+                {t.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Download PDF — always visible */}
         <button
-          onClick={() => downloadPdf(id, title).catch((e) => alert(e.message))}
+          onClick={() => downloadPdf(id, title, template).catch((e) => alert(e.message))}
           className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-3 rounded-xl text-sm font-medium hover:bg-gray-700 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          Download PDF
+          Download PDF ({TEMPLATES.find((t) => t.id === template)?.name})
         </button>
 
         {atLimit && (

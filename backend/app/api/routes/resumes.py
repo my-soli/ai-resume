@@ -113,11 +113,12 @@ async def get_versions(
 @router.get("/{resume_id}/download")
 async def download_pdf(
     resume_id: str,
+    template: str = "modern",
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
     resume = await ResumeService(db).get_by_id(resume_id, user_id)
-    pdf_bytes = generate_resume_pdf(dict(resume))
+    pdf_bytes = generate_resume_pdf(dict(resume), template=template)
     filename = f"resume_{resume_id[:8]}_{uuid.uuid4().hex[:6]}.pdf"
     await save_pdf(pdf_bytes, filename)
 

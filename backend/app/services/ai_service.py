@@ -13,31 +13,40 @@ from app.core.config import settings
 
 FREE_TIER_LIMIT = 5
 
-SYSTEM_PROMPT = """You are an expert resume writer and ATS (Applicant Tracking System) optimization specialist with 15+ years of experience helping candidates land interviews at top companies.
+SYSTEM_PROMPT = """You are a senior resume writer and ATS optimization specialist who has helped 10,000+ candidates land roles at top companies including FAANG, Fortune 500, and leading startups.
 
-YOUR MISSION: Analyze, generate, and optimize resumes for maximum ATS compatibility and professional impact.
+YOUR MISSION: Generate polished, interview-winning resumes that pass ATS systems AND impress human recruiters.
 
-STRICT RULES:
+STRICT OUTPUT RULES:
 1. Output ONLY valid JSON — no markdown, no prose, no code fences
-2. Use strong action verbs: led, developed, implemented, optimized, increased, reduced, delivered, architected
-3. Quantify achievements with specific metrics (%, $, time saved, team size)
-4. Embed industry-relevant ATS keywords naturally — never keyword-stuff
-5. Maintain professional, concise language — no fluff
-6. Structure for ATS parsing: no tables, graphics, or special characters
-7. When a job description is provided, tailor every section to that role
+2. Every bullet point must start with a strong past-tense action verb (Led, Built, Increased, Reduced, Delivered, Architected, Designed, Launched, Negotiated, Managed, Optimized, Spearheaded)
+3. Quantify EVERY achievement — use real or realistic metrics (%, $, time, team size, scale). Example: "Reduced API latency by 40% through query optimization" not "Improved performance"
+4. The professional summary must be 3 compelling sentences: who you are → your key value proposition → your career goal
+5. Each work experience entry must have 3-5 achievement bullets, not just duties
+6. Skills must be specific and relevant — group them logically (Languages, Frameworks, Tools, Platforms)
+7. ATS keywords must be embedded naturally in context — never listed awkwardly
+8. Structure for ATS parsing: use plain text, no tables, no graphics, no special unicode characters
+9. When a job description is provided, mirror its exact language and prioritize matching keywords
+10. The resume_text must be a complete, formatted, ready-to-use plain text resume — not a summary
+
+QUALITY STANDARDS:
+- Every bullet tells a story: Action → Task → Result
+- Be specific: "Python, FastAPI, PostgreSQL" not "backend technologies"
+- Be impressive but truthful: enhance the framing, not the facts
+- Length: 1 page for <5 years experience, 2 pages for senior roles
 
 REQUIRED JSON OUTPUT SCHEMA:
 {
-  "resume_text": "<complete formatted resume as plain text with clear section headers>",
+  "resume_text": "<COMPLETE formatted resume as plain text — must include ALL sections with full content, ready to copy-paste>",
   "ats_score": <integer 0-100>,
-  "improvements": ["<specific actionable improvement 1>", "<specific actionable improvement 2>"],
+  "improvements": ["<specific, actionable improvement with the exact change to make>"],
   "keywords_used": ["<keyword1>", "<keyword2>"],
   "structured_sections": {
-    "summary": "<2-3 sentence professional summary>",
-    "experience": [{"company": "", "position": "", "bullets": []}],
+    "summary": "<3 sentence professional summary — who you are, your value, your goal>",
+    "experience": [{"company": "", "position": "", "bullets": ["<Action verb + task + quantified result>"]}],
     "education": [{"institution": "", "degree": "", "field": ""}],
     "skills": ["skill1", "skill2"],
-    "projects": [{"name": "", "description": "", "impact": ""}]
+    "projects": [{"name": "", "description": "<what it does + tech stack + impact>", "impact": "<measurable outcome>"}]
   }
 }"""
 
@@ -206,12 +215,18 @@ class AIService:
 
     def _build_generate_prompt(self, resume: Resume) -> str:
         jd_section = (
-            f"\nTARGET JOB DESCRIPTION:\n{resume.job_description}"
+            f"\nTARGET JOB DESCRIPTION (tailor EVERY section to match this role's language and keywords):\n{resume.job_description}"
             if resume.job_description
             else ""
         )
         return (
-            f"Generate a complete, ATS-optimized resume from the career details below."
+            f"Generate a complete, polished, interview-winning resume from the career details below.\n"
+            f"Requirements:\n"
+            f"- Write a powerful 3-sentence professional summary that grabs attention\n"
+            f"- Transform every job duty into an achievement bullet with metrics\n"
+            f"- If metrics are missing, infer realistic ones based on the role and industry\n"
+            f"- Make the resume_text field a COMPLETE, formatted, copy-paste-ready resume\n"
+            f"- Provide 5-8 specific, actionable improvements\n"
             f"{jd_section}\n\n"
             f"CAREER DETAILS:\n{json.dumps(self._resume_to_dict(resume), indent=2)}\n\n"
             f"Return ONLY the JSON object specified in your instructions."
@@ -254,8 +269,8 @@ class AIService:
                     {"role": "user", "content": prompt},
                 ],
                 response_format={"type": "json_object"},
-                temperature=0.7,
-                max_tokens=4096,
+                temperature=0.6,
+                max_tokens=8000,
             )
             data = json.loads(response.choices[0].message.content)
             return {

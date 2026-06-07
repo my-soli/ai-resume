@@ -162,10 +162,10 @@ export const resumes = {
   },
 };
 
-export async function downloadPdf(resumeId: string, title: string) {
+export async function downloadPdf(resumeId: string, title: string, template = "modern") {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
-  const res = await fetch(`${BASE}/api/v1/resumes/${resumeId}/download`, {
+  const res = await fetch(`${BASE}/api/v1/resumes/${resumeId}/download?template=${template}`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   if (!res.ok) throw new Error("Download failed");
