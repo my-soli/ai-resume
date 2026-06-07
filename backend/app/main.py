@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.api.routes import auth, users, resumes
 from app.api.routes import ai as ai_router
 from app.api.routes import subscriptions as subscriptions_router
+from app.api.routes import reviews as reviews_router
 
 
 @asynccontextmanager
@@ -50,6 +51,7 @@ app.include_router(users.router, prefix="/api/v1")
 app.include_router(resumes.router, prefix="/api/v1")
 app.include_router(ai_router.router, prefix="/api/v1")
 app.include_router(subscriptions_router.router, prefix="/api/v1")
+app.include_router(reviews_router.router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["Health"])

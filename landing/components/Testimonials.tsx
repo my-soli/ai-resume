@@ -1,5 +1,3 @@
-// Replace GOOGLE_REVIEW_LINK with your Google Business Profile review URL
-const GOOGLE_REVIEW_LINK = "https://g.page/r/aicvbuilder/review"; // update after Google Business setup
 
 const testimonials = [
   { name: "John M.", role: "Software Engineer", city: "Nairobi", score: 91, quote: "Got 3 interview callbacks in 2 weeks after AI CV Builder rewrote my CV. My ATS score went from 52 to 91 in one click." },
@@ -21,15 +19,13 @@ export default function Testimonials() {
             Thousands of Kenyans and East Africans have used AI CV Builder to land interviews at top companies.
           </p>
           <a
-            href={GOOGLE_REVIEW_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-white border-2 border-gray-200 hover:border-primary text-gray-700 hover:text-primary font-medium px-5 py-2.5 rounded-xl text-sm transition-colors shadow-sm"
+            href="/reviews"
+            className="inline-flex items-center gap-2 bg-primary text-white hover:bg-indigo-700 font-medium px-5 py-2.5 rounded-xl text-sm transition-colors shadow-sm"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
-            Leave a Google Review
+            Leave a Review
           </a>
         </div>
 
