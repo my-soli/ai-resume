@@ -187,6 +187,8 @@ export const ai = {
     req<AIResult>("/ai/improve", { method: "POST", body: { resume_id } }),
   score: (resume_id: string) =>
     req<AIResult>("/ai/score", { method: "POST", body: { resume_id } }),
+  coverLetter: (resume_id: string, company_name = "", job_title = "") =>
+    req<AIResult>("/ai/cover-letter", { method: "POST", body: { resume_id, company_name, job_title } }),
   usage: () => req<Usage>("/ai/usage"),
   latestResult: (resume_id: string) =>
     req<AIResult | null>(`/ai/results/${resume_id}/latest`),

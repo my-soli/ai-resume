@@ -18,6 +18,7 @@ export default function Header() {
           <a href="#how-it-works" className="text-sm text-gray-600 hover:text-primary transition-colors">How it works</a>
           <a href="#pricing" className="text-sm text-gray-600 hover:text-primary transition-colors">Pricing</a>
           <a href="#faq" className="text-sm text-gray-600 hover:text-primary transition-colors">FAQ</a>
+          <a href="/blog" className="text-sm text-gray-600 hover:text-primary transition-colors">Blog</a>
           <a href="/app/login" className="text-sm text-gray-600 hover:text-primary transition-colors">Sign in</a>
           <a
             href="/app/register"
@@ -42,6 +43,7 @@ export default function Header() {
           <a href="#how-it-works" className="text-sm text-gray-700" onClick={() => setOpen(false)}>How it works</a>
           <a href="#pricing" className="text-sm text-gray-700" onClick={() => setOpen(false)}>Pricing</a>
           <a href="#faq" className="text-sm text-gray-700" onClick={() => setOpen(false)}>FAQ</a>
+          <a href="/blog" className="text-sm text-gray-700" onClick={() => setOpen(false)}>Blog</a>
           <a href="/app/login" className="text-sm text-gray-700" onClick={() => setOpen(false)}>Sign in</a>
           <a
             href="/app/register"

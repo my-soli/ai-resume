@@ -42,6 +42,11 @@ export default function ResumeEditorPage() {
   const [aiError, setAiError] = useState("");
   const [copied, setCopied] = useState(false);
   const [template, setTemplate] = useState("modern");
+  const [coverLetter, setCoverLetter] = useState("");
+  const [clCompany, setClCompany] = useState("");
+  const [clJobTitle, setClJobTitle] = useState("");
+  const [clCopied, setClCopied] = useState(false);
+  const [showCL, setShowCL] = useState(false);
 
   const populateForm = useCallback((r: Resume) => {
     setTitle(r.title);
@@ -387,6 +392,57 @@ export default function ResumeEditorPage() {
               </button>
             );
           })}
+
+          {/* Cover Letter */}
+          <button
+            onClick={() => setShowCL((v) => !v)}
+            disabled={aiLoading || atLimit}
+            className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-gray-100 hover:border-violet-400 hover:bg-violet-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-left"
+          >
+            <span className="text-xl shrink-0">✉️</span>
+            <div>
+              <div className="text-sm font-medium text-gray-900">Cover Letter</div>
+              <div className="text-xs text-gray-500">AI-written cover letter</div>
+            </div>
+          </button>
+          {showCL && (
+            <div className="space-y-2 px-1">
+              <input
+                value={clJobTitle}
+                onChange={(e) => setClJobTitle(e.target.value)}
+                placeholder="Job title (optional)"
+                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-violet-400"
+              />
+              <input
+                value={clCompany}
+                onChange={(e) => setClCompany(e.target.value)}
+                placeholder="Company name (optional)"
+                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-violet-400"
+              />
+              <button
+                onClick={async () => {
+                  setAiLoading(true);
+                  setAiError("");
+                  try {
+                    await handleSave();
+                    const result = await ai.coverLetter(id, clCompany, clJobTitle);
+                    setCoverLetter(result.resume_text);
+                    const usageData = await ai.usage();
+                    setUsage(usageData);
+                    setShowCL(false);
+                  } catch (err) {
+                    setAiError(err instanceof Error ? err.message : "Failed");
+                  } finally {
+                    setAiLoading(false);
+                  }
+                }}
+                disabled={aiLoading}
+                className="w-full bg-violet-600 text-white py-2 rounded-lg text-xs font-medium hover:bg-violet-700 transition-colors disabled:opacity-60"
+              >
+                {aiLoading ? "Generating…" : "Generate Cover Letter"}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Template Picker */}
@@ -534,10 +590,42 @@ export default function ResumeEditorPage() {
           </div>
         )}
 
-        {!aiResult && !aiLoading && (
+        {!aiResult && !aiLoading && !coverLetter && (
           <div className="text-center py-6 text-gray-400">
             <div className="text-3xl mb-2">🤖</div>
             <p className="text-xs">Run an AI operation to see your score and improvements</p>
+          </div>
+        )}
+
+        {/* Cover Letter Result */}
+        {coverLetter && (
+          <div className="border-t border-gray-100 pt-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold text-violet-700 flex items-center gap-1.5">
+                ✉️ Cover Letter
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(coverLetter);
+                    setClCopied(true);
+                    setTimeout(() => setClCopied(false), 2000);
+                  }}
+                  className="text-xs text-violet-600 hover:underline"
+                >
+                  {clCopied ? "Copied!" : "Copy"}
+                </button>
+                <button onClick={() => setCoverLetter("")} className="text-xs text-gray-400 hover:text-red-400">
+                  Clear
+                </button>
+              </div>
+            </div>
+            <textarea
+              readOnly
+              value={coverLetter}
+              rows={10}
+              className="w-full text-xs text-gray-700 border border-violet-100 rounded-xl p-3 bg-violet-50 resize-none focus:outline-none"
+            />
           </div>
         )}
       </div>

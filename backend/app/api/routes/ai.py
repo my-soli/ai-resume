@@ -5,12 +5,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from app.core.security import get_current_user_id
 from app.core.config import settings
+from pydantic import BaseModel
 from app.schemas.ai import (
     AIResultResponse,
     GenerateResumeRequest,
     ImproveResumeRequest,
     ScoreResumeRequest,
 )
+
+class CoverLetterRequest(BaseModel):
+    resume_id: str
+    company_name: str = ""
+    job_title: str = ""
 from app.services.ai_service import AIService
 
 router = APIRouter(prefix="/ai", tags=["AI Engine"])
@@ -48,6 +54,19 @@ async def score_resume(
     db: AsyncSession = Depends(get_db),
 ):
     return await AIService(db).score_resume(data.resume_id, user_id)
+
+
+@router.post("/cover-letter", response_model=AIResultResponse)
+@limiter.limit(settings.AI_RATE_LIMIT)
+async def generate_cover_letter(
+    request: Request,
+    data: CoverLetterRequest,
+    user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    return await AIService(db).generate_cover_letter(
+        data.resume_id, user_id, data.company_name, data.job_title
+    )
 
 
 @router.get("/usage")

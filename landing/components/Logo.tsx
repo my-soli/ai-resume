@@ -56,9 +56,9 @@ export default function Logo({
       <LogoMark size={size} />
       {showText && (
         <span className="font-bold text-gray-900 text-lg leading-none tracking-tight">
-          Resume
+          AI CV{" "}
           <span className="bg-gradient-to-r from-indigo-500 to-violet-600 bg-clip-text text-transparent">
-            AI
+            Builder
           </span>
         </span>
       )}

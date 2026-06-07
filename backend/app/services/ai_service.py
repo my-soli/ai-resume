@@ -77,6 +77,40 @@ class AIService:
         result = await self._call_openai(prompt)
         return await self._save_result(resume_id, "score", result)
 
+    async def generate_cover_letter(
+        self, resume_id: str, user_id: str,
+        company_name: str = "", job_title: str = ""
+    ) -> dict:
+        await self._check_usage_limit(user_id)
+        resume = await self._get_resume(resume_id, user_id)
+        prompt = self._build_cover_letter_prompt(resume, company_name, job_title)
+        try:
+            response = await self.client.chat.completions.create(
+                model=settings.GROQ_MODEL,
+                messages=[
+                    {"role": "system", "content": (
+                        "You are an expert cover letter writer. Write professional, concise, "
+                        "compelling cover letters that get interviews. "
+                        "Output ONLY the cover letter text — no JSON, no explanations, no markdown. "
+                        "3-4 paragraphs: hook, why you fit, specific value you bring, call to action. "
+                        "Tone: confident but not arrogant. Length: 250-350 words."
+                    )},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.7,
+                max_tokens=2000,
+            )
+            text = response.choices[0].message.content.strip()
+            return await self._save_result(resume_id, "cover_letter", {
+                "resume_text": text,
+                "ats_score": 0,
+                "improvements": [],
+                "keywords_used": [],
+                "structured_data": {},
+            })
+        except Exception as e:
+            raise HTTPException(status_code=502, detail=f"Cover letter generation failed: {str(e)}")
+
     async def parse_cv_text(self, cv_text: str) -> dict:
         prompt = (
             "Parse this CV/resume into structured JSON. "
@@ -244,6 +278,17 @@ class AIService:
             f"CURRENT RESUME:\n{json.dumps(self._resume_to_dict(resume), indent=2)}\n\n"
             f"Focus on: stronger verbs, quantified achievements, ATS keyword density, conciseness.\n"
             f"Return ONLY the JSON object specified in your instructions."
+        )
+
+    def _build_cover_letter_prompt(self, resume: Resume, company_name: str, job_title: str) -> str:
+        personal = resume.personal_info or {}
+        name = personal.get("name", "the candidate")
+        jd = f"\nTARGET ROLE: {job_title} at {company_name}" if (company_name or job_title) else ""
+        jd_text = f"\nJOB DESCRIPTION:\n{resume.job_description}" if resume.job_description else ""
+        return (
+            f"Write a compelling cover letter for {name}.{jd}{jd_text}\n\n"
+            f"CANDIDATE BACKGROUND:\n{json.dumps(self._resume_to_dict(resume), indent=2)}\n\n"
+            f"Write the cover letter now. Output ONLY the letter text, starting with 'Dear Hiring Manager,'."
         )
 
     def _build_score_prompt(self, resume: Resume) -> str:
