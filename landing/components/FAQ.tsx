@@ -12,7 +12,7 @@ const faqs = [
   },
   {
     q: "Can I pay via M-Pesa?",
-    a: "Yes! All paid plans (Pay-per-CV at KES 150, Weekly Pass at KES 299, and Pro Monthly at KES 499) can be paid via M-Pesa, Visa, or Mastercard through Paystack. No Kenyan card or dollar account required.",
+    a: "Yes! All paid plans (Pay-per-CV at KES 150, Weekly Pass at KES 299, and Pro Monthly at KES 499) can be paid via M-Pesa, Visa, or Mastercard through Paddle. No dollar account required.",
   },
   {
     q: "What's included in the free tier?",
@@ -32,7 +32,7 @@ const faqs = [
   },
   {
     q: "Can I cancel Pro anytime?",
-    a: "Yes — subscriptions are managed through Paystack and can be cancelled anytime from your account settings. You'll keep Pro access until the end of the current billing period.",
+    a: "Yes — subscriptions are managed through Paddle and can be cancelled anytime from your account settings. You'll keep Pro access until the end of the current billing period.",
   },
 ];
 

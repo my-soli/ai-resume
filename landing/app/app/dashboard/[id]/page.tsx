@@ -156,6 +156,75 @@ export default function ResumeEditorPage() {
     setTimeout(() => setSaveMsg(""), 4000);
   }
 
+  function shareScoreCard(atsScore: number, name: string) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 420;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Background gradient
+    const grad = ctx.createLinearGradient(0, 0, 800, 420);
+    grad.addColorStop(0, "#4F46E5");
+    grad.addColorStop(1, "#7C3AED");
+    ctx.fillStyle = grad;
+    ctx.roundRect(0, 0, 800, 420, 24);
+    ctx.fill();
+
+    // White card
+    ctx.fillStyle = "rgba(255,255,255,0.1)";
+    ctx.roundRect(40, 40, 720, 340, 16);
+    ctx.fill();
+
+    // Score circle
+    const cx = 200, cy = 210, r = 100;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(255,255,255,0.2)";
+    ctx.lineWidth = 14;
+    ctx.stroke();
+
+    const scoreColor = atsScore >= 80 ? "#10B981" : atsScore >= 60 ? "#F59E0B" : "#EF4444";
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + (atsScore / 100) * Math.PI * 2);
+    ctx.strokeStyle = scoreColor;
+    ctx.lineWidth = 14;
+    ctx.lineCap = "round";
+    ctx.stroke();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 56px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(String(atsScore), cx, cy + 10);
+    ctx.font = "18px Arial";
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.fillText("ATS Score", cx, cy + 38);
+
+    // Text
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 32px Arial";
+    ctx.fillText(name || "My CV", 340, 160);
+
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
+    const verdict = atsScore >= 80 ? "Strong — Ready for top employers" : atsScore >= 60 ? "Average — Needs some improvements" : "Needs Work — High ATS rejection risk";
+    ctx.fillText(verdict, 340, 200);
+
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.font = "16px Arial";
+    ctx.fillText("Scored by AI CV Builder", 340, 250);
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.font = "bold 16px Arial";
+    ctx.fillText("aicvbuilder.co.ke", 340, 275);
+
+    // Download
+    const a = document.createElement("a");
+    a.download = `ATS-Score-${atsScore}.png`;
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+  }
+
   function updateWork(i: number, field: keyof WorkExperience, value: unknown) {
     setWorkExp((prev) => prev.map((w, idx) => idx === i ? { ...w, [field]: value } : w));
   }
@@ -521,6 +590,13 @@ export default function ResumeEditorPage() {
                 <div className="text-xs text-gray-400 mt-1">
                   {new Date(aiResult.created_at).toLocaleString()}
                 </div>
+                {/* Share Score Card */}
+                <button
+                  onClick={() => shareScoreCard(score, personal.name || title)}
+                  className="mt-2 text-xs text-primary hover:underline flex items-center gap-1"
+                >
+                  📤 Share my score
+                </button>
               </div>
             </div>
 

@@ -13,7 +13,13 @@ declare global {
 }
 
 const PADDLE_TOKEN = "live_f4a6df1ec37709695edb6863591";
-const PADDLE_PRICE_ID = "pri_01kteyj83nxmtebqv9f48316d0";
+
+// Price IDs — set up in your Paddle dashboard then add to env vars
+const PADDLE_PRICES = {
+  pro:     process.env.NEXT_PUBLIC_PADDLE_PRICE_PRO     ?? "pri_01kteyj83nxmtebqv9f48316d0",
+  weekly:  process.env.NEXT_PUBLIC_PADDLE_PRICE_WEEKLY  ?? "",
+  payperCV: process.env.NEXT_PUBLIC_PADDLE_PRICE_PAYPERCV ?? "",
+};
 
 export default function DashboardLayout({
   children,
@@ -23,6 +29,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -39,7 +46,6 @@ export default function DashboardLayout({
       });
   }, [router]);
 
-  // Load Paddle.js
   useEffect(() => {
     if (document.getElementById("paddle-js")) return;
     const script = document.createElement("script");
@@ -51,10 +57,10 @@ export default function DashboardLayout({
     document.head.appendChild(script);
   }, []);
 
-  function openCheckout() {
-    if (!user || !window.Paddle) return;
+  function openCheckout(priceId: string) {
+    if (!user || !window.Paddle || !priceId) return;
     window.Paddle.Checkout.open({
-      items: [{ priceId: PADDLE_PRICE_ID, quantity: 1 }],
+      items: [{ priceId, quantity: 1 }],
       customer: { email: user.email },
     });
   }
@@ -92,7 +98,7 @@ export default function DashboardLayout({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            My Resumes
+            My CVs
           </Link>
           <Link
             href="/app/dashboard/new"
@@ -105,7 +111,7 @@ export default function DashboardLayout({
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            New Resume
+            New CV
           </Link>
         </nav>
 
@@ -117,9 +123,7 @@ export default function DashboardLayout({
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-gray-900 truncate">
-                {user.full_name}
-              </div>
+              <div className="text-sm font-medium text-gray-900 truncate">{user.full_name}</div>
               <div className="text-xs text-gray-500 truncate">
                 {user.is_pro ? (
                   <span className="text-primary font-medium">✦ Pro</span>
@@ -129,14 +133,49 @@ export default function DashboardLayout({
               </div>
             </div>
           </div>
+
           {!user.is_pro && (
-            <button
-              onClick={openCheckout}
-              className="w-full text-center bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-xs font-semibold py-2 rounded-lg hover:opacity-90 transition-opacity mb-2"
-            >
-              Upgrade to Pro — $4.99/mo
-            </button>
+            <>
+              {/* Toggle upgrade options */}
+              <button
+                onClick={() => setShowUpgrade((v) => !v)}
+                className="w-full text-center bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-xs font-semibold py-2 rounded-lg hover:opacity-90 transition-opacity mb-1"
+              >
+                Upgrade ↑
+              </button>
+
+              {showUpgrade && (
+                <div className="space-y-1.5 mb-2 mt-1">
+                  {PADDLE_PRICES.payperCV && (
+                    <button
+                      onClick={() => openCheckout(PADDLE_PRICES.payperCV)}
+                      className="w-full text-left text-xs px-2.5 py-2 rounded-lg border border-gray-100 hover:border-primary hover:bg-indigo-50 transition-colors"
+                    >
+                      <div className="font-semibold text-gray-900">Pay-per-CV</div>
+                      <div className="text-gray-400">KES 150 · one-time</div>
+                    </button>
+                  )}
+                  {PADDLE_PRICES.weekly && (
+                    <button
+                      onClick={() => openCheckout(PADDLE_PRICES.weekly)}
+                      className="w-full text-left text-xs px-2.5 py-2 rounded-lg border border-primary bg-indigo-50 hover:bg-indigo-100 transition-colors"
+                    >
+                      <div className="font-semibold text-primary">Weekly Pass ⭐</div>
+                      <div className="text-indigo-400">KES 299 · 7 days unlimited</div>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => openCheckout(PADDLE_PRICES.pro)}
+                    className="w-full text-left text-xs px-2.5 py-2 rounded-lg border border-gray-100 hover:border-primary hover:bg-indigo-50 transition-colors"
+                  >
+                    <div className="font-semibold text-gray-900">Pro Monthly</div>
+                    <div className="text-gray-400">KES 499/mo · unlimited</div>
+                  </button>
+                </div>
+              )}
+            </>
           )}
+
           <button
             onClick={() => {
               localStorage.clear();
